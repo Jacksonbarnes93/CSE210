@@ -17,7 +17,6 @@ class Program
             Console.WriteLine("5. Exit");
             Console.Write("Choose an option (1-5): ");
             choice = Console.ReadLine();
-
             switch (choice)
             {
                 case "1":
@@ -32,7 +31,7 @@ class Program
                     journal.SaveToFile(saveFile);
                     break;
                 case "4":
-                    Console.Write("Enter filename to load from: ");
+                    Console.Write("Enter the filename to load from: ");
                     string loadFile = Console.ReadLine();
                     journal.LoadFromFile(loadFile);
                     break;
