@@ -1,17 +1,22 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Text.Json;
+
 
 public class Journal
 {
-    private List<Entry> entries = new List<Entry>();
-    private List<string> prompts = new List<string>
+    public List<Entry> entries = new List<Entry>();
+    public List<string> prompts = new List<string>
     {
         "Who was the most interesting person I interacted with today?",
         "What was the best part of my day?",
         "How did I see the hand of the Lord in my life today?",
         "What was the strongest emotion I felt today?",
-        "If I had one thing I could do over today, what would it be?"
+        "If I had one thing I could do over today, what would it be?",
+        "What did you learn today that you can remerber from memory?",
+        "What part of today changed you?",
+        "What did you do today that prepared you for tommorow?",
     };
     public void AddEntry()
     {
@@ -33,33 +38,29 @@ public class Journal
     }
     public void SaveToFile(string filename)
     {
-        using (StreamWriter writer = new StreamWriter(filename))
-        {
-            foreach (Entry entry in entries)
-            {
-                writer.WriteLine(entry.ToFileString());
-            }
-        }
-        Console.WriteLine("Journal saved.");
+        string json = JsonSerializer.Serialize(entries, new JsonSerializerOptions { WriteIndented = true });
+        File.WriteAllText(filename, json);
+        Console.WriteLine("Journal saved to JSON file.");
     }
 
     public void LoadFromFile(string filename)
     {
         if (!File.Exists(filename))
         {
-            Console.WriteLine("File not found.");
+            Console.WriteLine("File was not found.");
             return;
         }
-
-        entries.Clear();
-
-        string[] lines = File.ReadAllLines(filename);
-        foreach (string line in lines)
+        string json = File.ReadAllText(filename);
+        var loadedEntries = JsonSerializer.Deserialize<List<Entry>>(json);
+        if (loadedEntries != null)
         {
-            Entry entry = Entry.FromFileString(line);
-            entries.Add(entry);
+            entries = loadedEntries;
+            Console.WriteLine("Journal was loaded from JSON file.\n");
+            DisplayJournal();
         }
-
-        Console.WriteLine ("Journal Loaded.");
+        else
+        {
+            Console.WriteLine("No valid entries were found in the file.");
+        }
     }
 }
